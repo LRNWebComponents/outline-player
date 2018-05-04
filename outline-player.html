@@ -1,91 +1,311 @@
 <link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../materializecss-styles/materializecss-styles.html">
-<link rel="import" href="../hax-body-behaviors/hax-body-behaviors.html">
 <link rel="import" href="../schema-behaviors/schema-behaviors.html">
+<link rel="import" href="../map-menu/map-menu.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../app-layout/app-header/app-header.html">
+<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../marked-element/marked-element.html">
 <!--
 `outline-player`
 A LRN element
 
 @demo demo/index.html
 
-@microcopy - the mental model for this element
- -
- -
-
 -->
-
 <dom-module id="outline-player">
   <template>
-    <style>
+    <style include="materializecss-styles">
       :host {
         display: block;
+        font-family:libre baskerville;
+        --app-drawer-width: 300px;
+      }
+      :host[closed] {
+        --app-drawer-width: 0px;
+      }
+      h1 {
+        font-size:3em;
+        line-height:1em;
+      }
+      h2 {
+        font-size:2em;
+      }
+      h3 {
+        font-size:1.75em;
+      }
+      p {
+        line-height:26px;
+        min-height: 26px;
+      }
+      a, a:visited, a:active {
+        color:#000;
+      }
+      a:hover {
+        color:#2196f3;
+      }
+      ul li {
+        padding-bottom:1.5em;
+        line-height:1.5;
+        color:#424242;
+        max-width:28em;
+      }
+      ul li:last-child {
+        padding-bottom:1em;
+      }
+      app-toolbar {
+        background-color: #4285f4;
+        color: #fff;
+      }
+
+      paper-icon-button {
+        --paper-icon-button-ink-color: white;
+      }
+
+      paper-icon-button + [main-title] {
+        margin-left: 24px;
+      }
+      paper-progress {
+        display: block;
+        width: 100%;
+        --paper-progress-active-color: rgba(255, 255, 255, 0.5);
+        --paper-progress-container-color: transparent;
+      }
+      app-header {
+        @apply --layout-fixed-top;
+        color: #fff;
+        --app-header-background-rear-layer: {
+          background-color: #ef6c00;
+        };
+      }
+      app-drawer {
+        --app-drawer-scrim-background: rgba(0, 0, 100, 0.8);
+        --app-drawer-content-container: {
+          overflow:scroll;
+          background-color: #B0BEC5;
+        }
+      }
+      .markdown-wrapper {
+        padding: 32px;
       }
     </style>
-    <h2>[[title]]</h2>
+    <iron-ajax
+      auto
+      url="[[outlineLocation]]/outline.json"
+      handle-as="json"
+      last-response="{{_outlineData}}"></iron-ajax>
+    <iron-ajax
+      auto
+      url="[[outlineLocation]]/[[activeItem.location]]"
+      handle-as="text"
+      loading="{{__loadingContent}}"
+      last-response="{{_activeItemContent}}"></iron-ajax>
+    <app-drawer-layout>
+      <app-drawer id="drawer" swipe-open slot="drawer">
+        <map-menu id="menu" items="{{outline}}" data="[[_outlineData]]" selected="{{selected}}"></map-menu>
+      </app-drawer>
+      <app-header-layout>
+      <app-header reveals slot="header">
+        <app-toolbar>
+          <paper-icon-button icon="menu" on-click="_toggleMenu"></paper-icon-button>
+          <div main-title>[[activeItem.title]]</div>
+          <paper-progress hidden$="[[!__loadingContent]]" value="10" indeterminate bottom-item></paper-progress>
+        </app-toolbar>
+      </app-header>
+      <marked-element markdown="[[markdown]]">
+        <div class="markdown-wrapper" slot="markdown-html"></div>
+      </marked-element>
+      </app-header-layout>
+    </app-drawer-layout>
   </template>
-
   <script>
     Polymer({
-
       is: 'outline-player',
-      behaviors: [HAXBehaviors.PropertiesBehaviors, MaterializeCSSBehaviors.ColorBehaviors, SchemaBehaviors.Schema],
+      behaviors: [
+        MaterializeCSSBehaviors.ColorBehaviors,
+        SchemaBehaviors.Schema
+      ],
       properties: {
         /**
-         * Title
+         * Outline JSON location
          */
-        title: {
+        outlineLocation: {
           type: String,
+        },
+        /**
+         * acitvely selected item
+         */
+        selected: {
+          type: String,
+          observer: '_selectedPageChanged',
+        },
+        /**
+         * Closed status for the drawer
+         */
+        closed: {
+          type: Boolean,
+          reflectToAttribute: true,
+          value: false,
+        },
+        /**
+         * Active item content
+         */
+        _activeItemContent: {
+          type: String,
+          observer: '_activeItemContentChanged',
+        },
+        /**
+         * Outline structured via JSON Outline Schema off the wire
+         */
+        outline: {
+          type: Array,
+          notify: true,
+          observer: '_outlineChanged',
+        },
+        /**
+         * markdown
+         */
+        markdown: {
+          type: String,
+        },
+        /**
+         * Active item which is in JSON Outline Schema
+         */
+        activeItem: {
+          type: Object,
+          notify: true,
+        },
+        /**
+         * Autoloader to ensure other components are there to work with
+         */
+        autoloader: {
+          type: Array,
+          value: [
+            "multiple-choice",
+            "oer-schema",
+            "hero-banner",
+            "magazine-cover",
+            "task-list",
+            "video-player",
+            "lrn-table",
+            "media-image",
+            "lrndesign-blockquote",
+            "meme-maker",
+            "a11y-gif-player",
+            "paper-audio-player",
+            "wikipedia-query",
+            "wave-player",
+            "pdf-element",
+            "lrn-vocab",
+            "lrn-math",
+            "person-testimonial",
+            "citation-element",
+            "lrn-calendar",
+            "code-editor",
+            "place-holder",
+            "aframe-player"
+          ],
+          observer: '_autoLoadChanged',
         },
       },
       /**
-       * Attached to the DOM, now fire.
+       * Link menu button to open and closing the side panel.
        */
-      attached: function() {
-        // Establish hax property binding
-        let props = {
-          'canScale': true,
-          'canPosition': true,
-          'canEditSource': false,
-          'gizmo': {
-            'title': 'Sample gizmo',
-            'description': 'The user will be able to see this for selection in a UI.',
-            'icon': 'av:play-circle-filled',
-            'color': 'grey',
-            'groups': ['Video', 'Media'],
-            'handles': [
-              {
-                'type': 'video',
-                'url': 'source'
-              }
-            ],
-            'meta': {
-              'author': 'Your organization on github'
-            }
-          },
-          'settings': {
-            'quick': [
-              {
-                'property': 'title',
-                'title': 'Title',
-                'description': 'The title of the element',
-                'inputMethod': 'textfield',
-                'icon': 'editor:title',
-              },
-            ],
-            'configure': [
-              {
-                'property': 'title',
-                'title': 'Title',
-                'description': 'The title of the element',
-                'inputMethod': 'textfield',
-                'icon': 'editor:title',
-              },
-            ],
-            'advanced': [
-            ]
+      _toggleMenu: function(e) {
+        this.$.drawer.toggle();
+        // allow styling to trigger based on open status
+        this.closed = !this.$.drawer.opened;
+        // kind of silly it doesn't just work this way but
+        // app-panel doesn't make any assumptions about how
+        // to handle the layout when it closes
+        this.async(function() {
+          // trick browser into thinking we just reized
+          window.dispatchEvent(new Event('resize'));
+          // forcibly update styles via css variables
+          Polymer.updateStyles();
+        });
+      },
+      /**
+       * Process only new elements
+       */
+      _autoLoadChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && newValue.constructor === Array) {
+          if (typeof this.__processedList === typeof undefined) {
+            this.__processedList = {};
           }
-        };
-        this.setHaxProperties(props);
+          // when new nodes show up in the slots then fire the needed pieces
+          for (var i in newValue) {
+            let tag = newValue[i].toLowerCase();
+            // see if we added this before
+            if (typeof this.__processedList[tag] === typeof undefined) {
+              // attempt a dynamic import with graceful failure / fallback
+              try {
+                this.__processedList[tag] = tag;
+                this.importHref(this.resolveUrl(`../${tag}/${tag}.html`), (e) => {
+                  //e.target.import
+                }, (e) => {
+                  //import failed
+                });
+              }
+              catch(err) {
+                // error in the event this is a double registration
+              }
+            }
+          }
+        }
+      },
+      /**
+       * Wipe slotted content
+       */
+      wipeSlot: function(element, slot = '') {
+        // 100% clean slate
+        if (slot === '*') {
+          while (Polymer.dom(element).firstChild !== null) {
+            Polymer.dom(element).removeChild(Polymer.dom(element).firstChild);
+          }
+        }
+        else {
+          for (var i in Polymer.dom(element).childNodes) {
+            // test for element nodes to be safe
+            if (typeof Polymer.dom(element).childNodes[i] !== typeof undefined && Polymer.dom(element).childNodes[i].slot === slot) {
+              Polymer.dom(element).removeChild(Polymer.dom(element).childNodes[i]);
+            }
+          }
+        }
+      },
+      /**
+       * active item content changed.
+       */
+      _activeItemContentChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && typeof oldValue !== typeof undefined) {
+          //this.wipeSlot(this);
+          this.markdown = newValue;
+          //let frag = document.createRange().createContextualFragment(newValue);
+          //Polymer.dom(this).appendChild(frag);
+        }
+      },
+      /**
+       * When outline changes let's do this.
+       */
+      _outlineChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined && typeof oldValue !== typeof undefined && newValue.constructor === Array && typeof newValue[0] !== typeof undefined) {
+          this.set('activeItem', newValue[0]);
+        }
+      },
+      /**
+       * Selected page has changed.
+       */
+      _selectedPageChanged: function(newValue, oldValue) {
+        if (typeof newValue !== typeof undefined) {
+          const item = this.$.menu.items.filter(d => newValue === d.id).pop();
+          console.log(item);
+          this.set('activeItem', item);
+        }
       },
     });
   </script>

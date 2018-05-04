@@ -12,17 +12,14 @@
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../outline-player.html">
 
-    <style is="custom-style" include="demo-pages-shared-styles">
+    <style>
+      body,html {
+        padding: 0;
+        margin: 0;
+      }
     </style>
   </head>
   <body>
-    <div class="vertical-section-container centered">
-      <h3>Basic outline-player demo</h3>
-      <demo-snippet>
-        <template>
-          <outline-player></outline-player>
-        </template>
-      </demo-snippet>
-    </div>
+    <outline-player outline-location="example"></outline-player>
   </body>
 </html>
