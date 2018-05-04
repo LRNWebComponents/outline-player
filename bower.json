@@ -37,7 +37,8 @@
     "person-testimonial": "LRNWebComponents/person-testimonial#^1.0.1",
     "hero-banner": "LRNWebComponents/hero-banner#^1.0.0",
     "oer-schema": "LRNWebComponents/oer-schema#^1.0.2",
-    "multiple-choice": "LRNWebComponents/multiple-choice#^0.3.0"
+    "multiple-choice": "LRNWebComponents/multiple-choice#^0.3.0",
+    "paper-tooltip": "PolymerElements/paper-tooltip#^2.1.1"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",

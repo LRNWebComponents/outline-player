@@ -10,6 +10,7 @@
 <link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../marked-element/marked-element.html">
 <!--
 `outline-player`
@@ -25,6 +26,8 @@ A LRN element
         display: block;
         font-family:libre baskerville;
         --app-drawer-width: 300px;
+        --outline-player-dark: #222222;
+        --outline-player-light: #F8F8F8;
       }
       :host[closed] {
         --app-drawer-width: 0px;
@@ -59,12 +62,25 @@ A LRN element
         padding-bottom:1em;
       }
       app-toolbar {
-        background-color: #4285f4;
-        color: #fff;
+        background-color: var(--outline-player-light);
+        color: var(--outline-player-dark);
+        font-weight: bold;
+        border-bottom: solid 1px var(--outline-player-dark);
+        -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        box-shadow: 0 0 6px -1px var(--outline-player-dark);
+      }
+      .outline-title {
+        font-size: 24px;
+        height: 64px;
+        padding: 16px;
+        margin: 0;
+      }
+      #menu {
+        padding: 8px;
       }
 
       paper-icon-button {
-        --paper-icon-button-ink-color: white;
+        --paper-icon-button-ink-color: var(--outline-player-dark);
       }
 
       paper-icon-button + [main-title] {
@@ -78,16 +94,19 @@ A LRN element
       }
       app-header {
         @apply --layout-fixed-top;
-        color: #fff;
+        color: var(--outline-player-dark);
         --app-header-background-rear-layer: {
-          background-color: #ef6c00;
+          background-color: var(--outline-player-light);
         };
       }
       app-drawer {
-        --app-drawer-scrim-background: rgba(0, 0, 100, 0.8);
+        border-bottom: solid 1px var(--outline-player-dark);
+        -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        --app-drawer-scrim-background: rgba(80, 80, 80, 0.8);
         --app-drawer-content-container: {
           overflow:scroll;
-          background-color: #B0BEC5;
+          background-color: var(--outline-player-light);
         }
       }
       .markdown-wrapper {
@@ -107,6 +126,7 @@ A LRN element
       last-response="{{_activeItemContent}}"></iron-ajax>
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
+        <h2 class="outline-title">[[outlineTitle]]</h2>
         <map-menu id="menu" items="{{outline}}" data="[[_outlineData]]" selected="{{selected}}"></map-menu>
       </app-drawer>
       <app-header-layout>
@@ -114,6 +134,20 @@ A LRN element
         <app-toolbar>
           <paper-icon-button icon="menu" on-click="_toggleMenu"></paper-icon-button>
           <div main-title>[[activeItem.title]]</div>
+          <paper-icon-button id="prevpage" disabled="[[disablePrevPage(__activeIndex)]]" icon="icons:arrow-back" on-click="prevPage"></paper-icon-button>
+          <paper-tooltip
+            for="prevpage"
+            position="bottom"
+            offset="14">
+            Previous Page
+          </paper-tooltip>
+          <paper-icon-button id="nextpage" disabled="[[disableNextPage(__activeIndex)]]" icon="icons:arrow-forward" on-click="nextPage"></paper-icon-button>
+          <paper-tooltip
+            for="nextpage"
+            position="bottom"
+            offset="14">
+            Next Page
+          </paper-tooltip>
           <paper-progress hidden$="[[!__loadingContent]]" value="10" indeterminate bottom-item></paper-progress>
         </app-toolbar>
       </app-header>
@@ -136,6 +170,13 @@ A LRN element
          */
         outlineLocation: {
           type: String,
+        },
+        /**
+         * Title of the outline.
+         */
+        outlineTitle: {
+          type: String,
+          value: 'Outline',
         },
         /**
          * acitvely selected item
@@ -186,6 +227,8 @@ A LRN element
         autoloader: {
           type: Array,
           value: [
+            "self-check",
+            "tab-list",
             "multiple-choice",
             "oer-schema",
             "hero-banner",
@@ -295,6 +338,48 @@ A LRN element
       _outlineChanged: function(newValue, oldValue) {
         if (typeof newValue !== typeof undefined && typeof oldValue !== typeof undefined && newValue.constructor === Array && typeof newValue[0] !== typeof undefined) {
           this.set('activeItem', newValue[0]);
+          this.__activeIndex = 0;
+        }
+      },
+      /**
+       * disablePrevPage
+       */
+      disablePrevPage: function(index) {
+        if (index === 0) {
+          return true;
+        }
+        return false;
+      },
+      /**
+       * disableNextPage
+       */
+      disableNextPage: function(index) {
+        if (index === (this._outlineData.length - 1)) {
+          return true;
+        }
+        return false;
+      },
+      /**
+       * Go back a page (if we can)
+       */
+      prevPage: function(e) {
+        this.changePage('previous');
+      },
+      /**
+       * Advance a page
+       */
+      nextPage: function(e) {
+        this.changePage('next');
+      },
+      /**
+       * Go forward a page
+       */
+      changePage: function(direction) {
+        if (direction == 'next' && this.__activeIndex < (this._outlineData.length - 1)) {
+          this.selected = this._outlineData[this.__activeIndex+1].id;
+        }
+        else if (direction == 'previous' && this.__activeIndex > 0) {
+          this.selected = this._outlineData[this.__activeIndex-1].id;
         }
       },
       /**
@@ -302,8 +387,12 @@ A LRN element
        */
       _selectedPageChanged: function(newValue, oldValue) {
         if (typeof newValue !== typeof undefined) {
-          const item = this.$.menu.items.filter(d => newValue === d.id).pop();
-          console.log(item);
+          const item = this._outlineData.filter((d,i) => {
+            if (newValue === d.id) {
+              this.__activeIndex = i;
+              return d;
+            }
+          }).pop();
           this.set('activeItem', item);
         }
       },
