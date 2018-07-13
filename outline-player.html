@@ -116,7 +116,7 @@ A LRN element
     </style>
     <iron-ajax
       auto
-      url="[[outlineLocation]]outline.json"
+      url="[[outlineLocation]][[outlineFile]]"
       handle-as="json"
       last-response="{{_outlineData}}"></iron-ajax>
     <iron-ajax
@@ -128,7 +128,7 @@ A LRN element
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
         <h2 class="outline-title">[[outlineTitle]]</h2>
-        <map-menu id="menu" items="{{outline}}" data="[[_outlineData]]" selected="{{selected}}"></map-menu>
+        <map-menu id="menu" items="{{outline}}" data="[[_outlineData.items]]" selected="{{selected}}"></map-menu>
       </app-drawer>
       <app-header-layout>
       <app-header reveals slot="header">
@@ -166,6 +166,13 @@ A LRN element
         SchemaBehaviors.Schema
       ],
       properties: {
+        /**
+         * Outline JSON file name
+         */
+        outlineFile: {
+          type: String,
+          value: 'outline.json',
+        },
         /**
          * Outline JSON location
          */
@@ -353,7 +360,7 @@ A LRN element
        * disableNextPage
        */
       disableNextPage: function(index) {
-        if (index === (this._outlineData.length - 1)) {
+        if (index === (this._outlineData.items.length - 1)) {
           return true;
         }
         return false;
@@ -374,11 +381,11 @@ A LRN element
        * Go forward a page
        */
       changePage: function(direction) {
-        if (direction == 'next' && this.__activeIndex < (this._outlineData.length - 1)) {
-          this.selected = this._outlineData[this.__activeIndex+1].id;
+        if (direction == 'next' && this.__activeIndex < (this._outlineData.items.length - 1)) {
+          this.selected = this._outlineData.items[this.__activeIndex+1].id;
         }
         else if (direction == 'previous' && this.__activeIndex > 0) {
-          this.selected = this._outlineData[this.__activeIndex-1].id;
+          this.selected = this._outlineData.items[this.__activeIndex-1].id;
         }
       },
       /**
@@ -386,7 +393,7 @@ A LRN element
        */
       _selectedPageChanged: function(newValue, oldValue) {
         if (typeof newValue !== typeof undefined) {
-          const item = this._outlineData.filter((d,i) => {
+          const item = this._outlineData.items.filter((d,i) => {
             if (newValue === d.id) {
               this.__activeIndex = i;
               return d;
