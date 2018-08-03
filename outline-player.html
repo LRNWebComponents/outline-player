@@ -128,7 +128,7 @@ A LRN element
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
         <h2 class="outline-title">[[outlineTitle]]</h2>
-        <map-menu id="menu" items="{{outline}}" data="[[_outlineData.items]]" selected="{{selected}}"></map-menu>
+        <map-menu id="menu" id="mapMenu" items="{{outline}}" data="[[_outlineData.items]]" selected="{{selected}}"></map-menu>
       </app-drawer>
       <app-header-layout>
       <app-header reveals slot="header">
@@ -393,13 +393,15 @@ A LRN element
        */
       _selectedPageChanged: function(newValue, oldValue) {
         if (typeof newValue !== typeof undefined) {
-          const item = this._outlineData.items.filter((d,i) => {
-            if (newValue === d.id) {
-              this.__activeIndex = i;
-              return d;
-            }
-          }).pop();
-          this.set('activeItem', item);
+          if (typeof this._outlineData !== typeof undefined) {
+            const item = this._outlineData.items.filter((d,i) => {
+              if (newValue === d.id) {
+                this.__activeIndex = i;
+                return d;
+              }
+            }).pop();
+            this.set('activeItem', item);
+          }
         }
       },
     });

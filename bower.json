@@ -48,6 +48,7 @@
     "place-holder": "LRNWebComponents/place-holder#^1.0.0"
   },
   "resolutions": {
+    "polymer": "^1.10.1",
     "webcomponentsjs": "^0.7.24"
   }
 }
