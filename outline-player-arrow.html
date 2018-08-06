@@ -1,0 +1,151 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../materializecss-styles/materializecss-styles.html">
+<link rel="import" href="../schema-behaviors/schema-behaviors.html">
+<link rel="import" href="../map-menu/map-menu.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../app-layout/app-header/app-header.html">
+<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+<!--
+`outline-player`
+A LRN element
+
+@demo demo/index.html
+
+-->
+<dom-module id="outline-player-arrow">
+  <template>
+    <style include="materializecss-styles">
+      :host {
+        display: block;
+        font-family:libre baskerville;
+        --app-drawer-width: 300px;
+        --outline-player-dark: #222222;
+        --outline-player-light: #F8F8F8;
+      }
+      :host[closed] {
+        --app-drawer-width: 0px;
+      }
+      h1 {
+        font-size:3em;
+        line-height:1em;
+      }
+      h2 {
+        font-size:2em;
+      }
+      h3 {
+        font-size:1.75em;
+      }
+      p {
+        line-height:26px;
+        min-height: 26px;
+      }
+      a, a:visited, a:active {
+        color:#000;
+      }
+      a:hover {
+        color:#2196f3;
+      }
+      ul li {
+        padding-bottom:1.5em;
+        line-height:1.5;
+        color:#424242;
+        max-width:28em;
+      }
+      ul li:last-child {
+        padding-bottom:1em;
+      }
+      app-toolbar {
+        background-color: var(--outline-player-light);
+        color: var(--outline-player-dark);
+        font-weight: bold;
+        border-bottom: solid 1px var(--outline-player-dark);
+        -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        box-shadow: 0 0 6px -1px var(--outline-player-dark);
+      }
+      .outline-title {
+        font-size: 24px;
+        height: 64px;
+        padding: 16px;
+        margin: 0;
+      }
+      #menu {
+        padding: 8px;
+      }
+
+      outline-player-navigation {
+        --outline-player-dark: var(--outline-player-dark);
+      }
+
+      paper-icon-button + [main-title] {
+        margin-left: 24px;
+      }
+      paper-progress {
+        display: block;
+        width: 100%;
+        --paper-progress-active-color: rgba(255, 255, 255, 0.5);
+        --paper-progress-container-color: transparent;
+      }
+      app-header {
+        @apply --layout-fixed-top;
+        color: var(--outline-player-dark);
+        
+        --app-header-background-rear-layer: {
+          background-color: var(--outline-player-light);
+        };
+      }
+      app-toolbar {
+        box-shadow: none;
+        border-bottom: none;
+        background: none;
+      }
+      app-drawer {
+        border-bottom: solid 1px var(--outline-player-dark);
+        -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        --app-drawer-scrim-background: rgba(80, 80, 80, 0.8);
+        --app-drawer-content-container: {
+          overflow:scroll;
+          background-color: var(--outline-player-light);
+        }
+      }
+      #slot {
+        padding: 1em;
+        max-width: 65em;
+        margin: auto;
+      }
+    </style>
+
+    <paper-icon-button id="button" disabled="[[disabled]]" icon="[[icon]]"></paper-icon-button>
+    <paper-tooltip
+      for="button"
+      position="bottom"
+      offset="14">
+      <slot></slot>
+    </paper-tooltip>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'outline-player-arrow',
+      behaviors: [
+        MaterializeCSSBehaviors.ColorBehaviors,
+        SchemaBehaviors.Schema
+      ],
+      properties: {
+        icon: {
+          type: String,
+          value: 'icons:arrow-back'
+        },
+        disabled: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+      },
+    });
+  </script>
+</dom-module>
