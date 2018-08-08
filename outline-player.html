@@ -9,6 +9,7 @@
 <link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
 <link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../iron-media-query/iron-media-query.html">
 <link rel="import" href="outline-player-arrow.html">
 <!--
 `outline-player`
@@ -93,7 +94,6 @@ A LRN element
       app-header {
         @apply --layout-fixed-top;
         color: var(--outline-player-dark);
-        
         --app-header-background-rear-layer: {
           background-color: var(--outline-player-light);
         };
@@ -113,10 +113,31 @@ A LRN element
           background-color: var(--outline-player-light);
         }
       }
+      #content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #content > * {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
       #slot {
         padding: 1em;
         max-width: 65em;
-        margin: auto;
+        flex: 1 1 auto;
+        order: 1;
+      }
+      .desktopNav {
+        margin-left: 2%;
+        margin-right: 2%;
+      }
+      #desktopNavLeft {
+        order: 0
+      }
+      #desktopNavRight {
+        order: 2
       }
     </style>
     <iron-ajax
@@ -141,14 +162,18 @@ A LRN element
           <paper-icon-button icon="menu" on-click="_toggleMenu"></paper-icon-button>
           <div main-title>
             [[activeItem.title]]
-            <slot id="title"></slot>
+            <div id="slotTitle">
+              <slot name="title"></slot>
+            </div>
           </div>
-          <outline-player-arrow id="prevpage" disabled="[[disablePrevPage(__activeIndex)]]" icon="icons:arrow-back" on-click="prevPage">
-            Previous page
-          </outline-player-arrow>
-          <outline-player-arrow id="nextpage" disabled="[[disableNextPage(__activeIndex)]]" icon="icons:arrow-forward" on-click="nextPage">
-            Next page
-          </outline-player-arrow>
+          <template is="dom-if" if="[[!breakpointDesktop]]">
+            <outline-player-arrow id="prevpage" disabled="[[disablePrevPage(__activeIndex)]]" icon="icons:arrow-back" on-click="prevPage">
+              Previous page
+            </outline-player-arrow>
+            <outline-player-arrow id="nextpage" disabled="[[disableNextPage(__activeIndex)]]" icon="icons:arrow-forward" on-click="nextPage">
+              Next page
+            </outline-player-arrow>
+          </template>
           <paper-progress hidden$="[[!__loadingContent]]" value="10" indeterminate bottom-item></paper-progress>
         </app-toolbar>
       </app-header>
@@ -156,11 +181,22 @@ A LRN element
         <div id="slot">
           <slot></slot>
         </div>
-        <div id="desktopNavLeft"></div>
-        <div id="desktopNavRight"></div>
+        <template is="dom-if" if="[[breakpointDesktop]]">
+          <div class="desktopNav" id="desktopNavLeft">
+            <outline-player-arrow id="prevpage" disabled="[[disablePrevPage(__activeIndex)]]" icon="icons:arrow-back" on-click="prevPage">
+              Previous page
+            </outline-player-arrow>
+          </div>
+          <div class="desktopNav" id="desktopNavRight">
+            <outline-player-arrow id="nextpage" disabled="[[disableNextPage(__activeIndex)]]" icon="icons:arrow-forward" on-click="nextPage">
+              Next page
+            </outline-player-arrow>
+          </div>
+        </template>
       </div>
       </app-header-layout>
     </app-drawer-layout>
+    <iron-media-query query="(min-width: 700px)" query-matches="{{breakpointDesktop}}"></iron-media-query>
   </template>
   <script>
     Polymer({
@@ -264,6 +300,10 @@ A LRN element
           ],
           observer: '_autoLoadChanged',
         },
+        breakpointDesktop: {
+          type: String,
+          value: '600px'
+        }
       },
       /**
        * Link menu button to open and closing the side panel.
