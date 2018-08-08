@@ -92,11 +92,6 @@ A LRN element
 
       }
 
-      app-drawer {
-        position: absolute;
-        min-height: var(--outline-play-min-height);
-      }
-
       .outline-title {
         font-size: 24px;
         height: 64px;
@@ -143,8 +138,10 @@ A LRN element
 
       app-drawer {
         border-bottom: solid 1px var(--outline-player-dark);
-        -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
-        box-shadow: 0 0 6px -1px var(--outline-player-dark);
+        -webkit-box-shadow: 0 0 6px -3px var(--outline-player-dark);
+        box-shadow: 0 0 6px -3px var(--outline-player-dark);
+        position: absolute;
+        min-height: var(--outline-play-min-height);
         --app-drawer-scrim-background: rgba(80, 80, 80, 0.8);
         --app-drawer-content-container: {
           overflow: scroll;
@@ -173,7 +170,7 @@ A LRN element
       .desktopNav {
         margin-left: 2%;
         margin-right: 2%;
-        margin-top: 8vw;
+        margin-top: calc(50vh);
         position: relative;
       }
 
