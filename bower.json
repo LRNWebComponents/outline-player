@@ -10,7 +10,8 @@
     "app-layout": "PolymerElements/app-layout#^2.1.1",
     "paper-progress": "PolymerElements/paper-progress#^2.1.1",
     "paper-icon-button": "PolymerElements/paper-icon-button#^2.2.0",
-    "paper-audio-player": "LRNWebComponents/paper-audio-player#1.1.1-lrn1"
+    "paper-audio-player": "LRNWebComponents/paper-audio-player#1.1.1-lrn1",
+    "iron-media-query": "PolymerElements/iron-media-query#^2.1.0"
   },
   "devDependencies": {
     "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
