@@ -24,6 +24,8 @@ A LRN element
       :host {
         display: block;
         font-family:libre baskerville;
+        position: relative;
+        overflow: hidden;
         --app-drawer-width: 300px;
         --outline-player-dark: #222222;
         --outline-player-light: #F8F8F8;
@@ -68,6 +70,9 @@ A LRN element
         -webkit-box-shadow: 0 0 6px -1px var(--outline-player-dark);
         box-shadow: 0 0 6px -1px var(--outline-player-dark);
       }
+      app-drawer {
+        position: absolute;
+      }
       .outline-title {
         font-size: 24px;
         height: 64px;
@@ -92,9 +97,13 @@ A LRN element
         --paper-progress-container-color: transparent;
       }
       app-header {
-        @apply --layout-fixed-top;
         color: var(--outline-player-dark);
+        /* Enable outline to be placed anywhere in the dom */
+        /* This will override the app-header-layout forcing fixed mode */
+        position: absolute !important;
+        left: 0 !important;
         --app-header-background-rear-layer: {
+        /* app-header-layout will force fixed */
           background-color: var(--outline-player-light);
         };
       }
