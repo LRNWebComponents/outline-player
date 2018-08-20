@@ -1,14 +1,4 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../materializecss-styles/materializecss-styles.html">
-<link rel="import" href="../schema-behaviors/schema-behaviors.html">
-<link rel="import" href="../map-menu/map-menu.html">
-<link rel="import" href="../iron-ajax/iron-ajax.html">
-<link rel="import" href="../app-layout/app-header/app-header.html">
-<link rel="import" href="../app-layout/app-toolbar/app-toolbar.html">
-<link rel="import" href="../app-layout/app-drawer/app-drawer.html">
-<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
-<link rel="import" href="../app-layout/app-header-layout/app-header-layout.html">
-<link rel="import" href="../paper-progress/paper-progress.html">
 <!--
 `outline-player`
 A LRN element
@@ -47,7 +37,6 @@ A LRN element
       is: 'outline-player-arrow',
       behaviors: [
         MaterializeCSSBehaviors.ColorBehaviors,
-        SchemaBehaviors.Schema
       ],
       properties: {
         icon: {
@@ -56,7 +45,7 @@ A LRN element
         },
         disabled: {
           type: Boolean,
-          value: false,
+          value: true,
           reflectToAttribute: true
         },
         sticky: {
@@ -92,6 +81,13 @@ A LRN element
             }
           }
         })
+      },
+      /**
+       * Reset the dynaimc positioning of the arrows.  Usefull for ajax page changes
+       */
+      resetPosition: function () {
+        const container = this.$.container
+        container.style.top = 0
       },
       /**
        * Sticky Nav has changed

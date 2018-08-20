@@ -20,7 +20,9 @@
           "order": 0,
           "parent": null,
           "title": "Page 1",
-          "metadata": {}
+          "metadata": {
+              "icon": "bookmark"
+          }
       },
       {
           "id": "item-05527fdd-e7aa-4179-8aab-6ecc255236a1",
@@ -29,7 +31,9 @@
           "order": 0,
           "parent": "item-85527fdd-e7aa-4179-8aab-6ecc255236a1",
           "title": "Page 2",
-          "metadata": {}
+          "metadata": {
+              "icon": "bookmark"
+          }
       },
       {
           "id": "item-06e983d2-bba6-4c71-b222-99ed77cfd4cd",
@@ -38,7 +42,9 @@
           "order": 2,
           "parent": null,
           "title": "Page 3",
-          "metadata": {}
+          "metadata": {
+              "icon": "icons:visibility-off"
+          }
       },
       {
           "id": "item-04919b87-7ae5-44f0-891e-6db24a21878b",

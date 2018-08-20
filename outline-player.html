@@ -26,9 +26,11 @@ A LRN element
         font-family: libre baskerville;
         position: relative;
         overflow: hidden;
+        --outline-player-min-height: '';
         --app-drawer-width: 300px;
         --outline-player-dark: #222222;
         --outline-player-light: #F8F8F8;
+        --outline-player-arrow-margin-top: 50px;
       }
 
       :host[closed] {
@@ -84,12 +86,12 @@ A LRN element
       }
 
       app-drawer-layout {
-        min-height: var(--outline-play-min-height);
         min-height: 100%;
         min-height: -moz-available;          /* WebKit-based browsers will ignore this. */
         min-height: -webkit-fill-available;  /* Mozilla-based browsers will ignore this. */
         min-height: fill-available;
-
+        /* if the user has set a specific value then override the defaults */
+        min-height: var(--outline-player-min-height);
       }
 
       .outline-title {
@@ -170,8 +172,8 @@ A LRN element
       .desktopNav {
         margin-left: 2%;
         margin-right: 2%;
-        margin-top: calc(50vh);
         position: relative;
+        margin-top: var(--outline-player-arrow-margin-top);
       }
 
       #desktopNavLeft {
@@ -182,8 +184,8 @@ A LRN element
         order: 2
       }
     </style>
-    <iron-ajax auto url="[[outlineLocation]][[outlineFile]]" handle-as="json" last-response="{{_outlineData}}"></iron-ajax>
-    <iron-ajax auto url="[[outlineLocation]][[activeItem.location]]" handle-as="text" loading="{{__loadingContent}}" last-response="{{_activeItemContent}}"></iron-ajax>
+    <iron-ajax auto="[[auto]]" url="[[outlineLocation]][[outlineFile]]" handle-as="json" last-response="{{_outlineData}}"></iron-ajax>
+    <iron-ajax auto="[[auto]]" url="[[outlineLocation]][[activeItem.location]]" handle-as="text" loading="{{__loadingContent}}" last-response="{{_activeItemContent}}"></iron-ajax>
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
         <h2 class="outline-title">[[outlineTitle]]</h2>
@@ -239,6 +241,13 @@ A LRN element
         SchemaBehaviors.Schema
       ],
       properties: {
+        /**
+         * Auto call json files
+         */
+        auto: {
+          type: Boolean,
+          value: false
+        },
         /**
          * Outline JSON file name
          */
@@ -333,10 +342,50 @@ A LRN element
           ],
           observer: '_autoLoadChanged',
         },
+        /**
+         * Define desktop breakpoint for adapted navigation
+         */
         breakpointDesktop: {
           type: String,
           value: '600px'
         },
+        /**
+         * Set min height of outline player to fill remaining
+         * space to the bottom of the browser
+         */
+        fillRemaining: {
+          type: Boolean,
+          value: false,
+          reflectToAttribute: true
+        }
+      },
+      attached: function () {
+        // if the user has fill remaining selected then run it
+        this.refreshDynamicPositions()
+        // also start listening for future resizing events to 
+        // re-run the code
+        window.addEventListener('resize', (e) => {
+          this.refreshDynamicPositions()
+        })
+      },
+      /**
+       * Update calculations for fill-remaining and arrow position
+       */
+       refreshDynamicPositions() {
+        // get bounding rect
+        const boundingRect = this.getBoundingClientRect()
+        // get windowHeight
+        const windowHeight = window.innerHeight
+        // simple subtraction to find out what the remaining space is
+        const minHeight = windowHeight - boundingRect.top
+        // now get where the arrows should be, and subtract 20 pixels to
+        // account for the height of the button
+        const arrowMargin = (minHeight / 2) - 20 
+        if (this.fillRemaining) {
+          this.customStyle['--outline-player-min-height'] = minHeight + 'px'
+        }
+        this.customStyle['--outline-player-arrow-margin-top'] = arrowMargin + 'px';
+        this.updateStyles()
       },
       /**
        * Link menu button to open and closing the side panel.
@@ -463,6 +512,11 @@ A LRN element
         }
         else if (direction == 'previous' && this.__activeIndex > 0) {
           this.selected = this._outlineData.items[this.__activeIndex - 1].id;
+        }
+        // tell arrows to reset in case we are jumped around the page
+        const arrows = this.querySelectorAll('outline-player-arrow')
+        for (let arrow of arrows) {
+          arrow.resetPosition()
         }
       },
       /**
