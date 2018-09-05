@@ -1,0 +1,29 @@
+{
+  "name": "smooth-scroll",
+  "description": "A LRN element",
+  "license": "Apache-2.0",
+  "main": "smooth-scroll.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.10.1"
+  },
+  "devDependencies": {
+    "iron-component-page": "PolymerElements/iron-component-page#^1.0.0",
+    "iron-demo-helpers": "PolymerElements/iron-demo-helpers#^1.0.0",
+    "web-component-tester": "^4.0.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.24"
+  },
+  "homepage": "https://github.com/LRNWebComponents/smooth-scroll",
+  "version": "1.0.3",
+  "_release": "1.0.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.0.3",
+    "commit": "333e07bc5b28ca00499b02a9b61a44e50dd19feb"
+  },
+  "_source": "https://github.com/LRNWebComponents/smooth-scroll.git",
+  "_target": "^1.0.3",
+  "_originalSource": "LRNWebComponents/smooth-scroll"
+}
