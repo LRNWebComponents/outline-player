@@ -188,8 +188,10 @@ A LRN element
     <iron-ajax auto="[[auto]]" url="[[outlineLocation]][[activeItem.location]]" handle-as="text" loading="{{__loadingContent}}" last-response="{{_activeItemContent}}"></iron-ajax>
     <app-drawer-layout>
       <app-drawer id="drawer" swipe-open slot="drawer">
-        <h2 class="outline-title">[[outlineTitle]]</h2>
-        <map-menu id="menu" id="mapMenu" items="{{outline}}" data="[[_outlineData.items]]" selected="{{selected}}" active-indicator></map-menu>
+        <template is="dom-if" if="[[__hasTitle(outlineTitle)]]">
+          <h2 class="outline-title">[[outlineTitle]]</h2>
+        </template>
+        <map-menu id="menu" id="mapMenu" items="{{outline}}" data="[[_outlineData.items]]" selected="{{selected}}" active-indicator auto-scroll></map-menu>
       </app-drawer>
       <app-header-layout>
         <app-header reveals slot="header">
@@ -266,7 +268,6 @@ A LRN element
          */
         outlineTitle: {
           type: String,
-          value: 'Outline',
         },
         /**
          * acitvely selected item
@@ -534,6 +535,12 @@ A LRN element
             this.set('activeItem', item);
           }
         }
+      },
+      /**
+       * Determine whether we should show the title
+       */
+      __hasTitle: function (outlineTitle) {
+        return outlineTitle ? true : false
       },
     });
   </script>
